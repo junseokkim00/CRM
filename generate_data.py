@@ -42,6 +42,10 @@ def main():
     dataloader = datasetLoader(args.dataset)
     
     print_now()
+
+
+    if not os.path.exists('./logs'):
+        os.mkdir('./logs')
             
     for i, data in enumerate(dataloader):
         if args.start <= i and i < args.end:

@@ -1,0 +1,10 @@
+torch
+transformers
+python_dotenv
+datasets
+tqdm
+openai
+langchain
+langchain_openai
+langchain_core
+pydantic

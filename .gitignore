@@ -1,0 +1,8 @@
+/__pycache__
+/.ipynb_checkpoints
+.env
+slurm-*
+dataset.zip
+/dataset
+/logs
+current.txt

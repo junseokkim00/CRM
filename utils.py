@@ -28,13 +28,16 @@ dataset_id={
     'strategyqa': 'ChilleD/StrategyQA'
 }
 
-def datasetLoader(dataset_name):
+def datasetLoader(dataset_name, split='train'):
     dataloader=[]
     if dataset_name == 'gsm8k':
         dataset = load_dataset(dataset_id[dataset_name], "main")
     else:
        dataset =  load_dataset(dataset_id[dataset_name])
-    dataset = dataset['train']
+    if split == 'train':
+        dataset = dataset['train']
+    else:
+       dataset = dataset['test']
     for data in tqdm(dataset):
         if dataset_name == 'gsm8k':
             dataloader.append((data['question'], data['answer'].split("####")[-1].strip()))
@@ -88,6 +91,21 @@ def inference(chat, model, tokenizer, device, sampling=True, temperature=0.6):
     decode_input = tokenizer.batch_decode(tokenized_chat, skip_special_tokens=True)[0]
     decode_output = tokenizer.batch_decode(output, skip_special_tokens=True)[0]
     return decode_output[len(decode_input):]
+
+def inference_batch(chat, model, tokenizer, device, sampling=True, temperature=0.6):
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = 'left'
+    outputs=[]
+    tokenized_chat = tokenizer.apply_chat_template(chat, tokenize=False, add_generation_prompt=True)
+    tokenized_chat = tokenizer(tokenized_chat, padding=True, return_tensors='pt')
+    tokenized_chat = tokenized_chat.to(device)
+    output = model.generate(**tokenized_chat, max_new_tokens=512, do_sample=sampling, temperature=temperature)
+    decode_input = tokenizer.batch_decode(tokenized_chat['input_ids'], skip_special_tokens=True)
+    decode_output = tokenizer.batch_decode(output, skip_special_tokens=True)
+    for do,di in zip(decode_output, decode_input):
+        outputs.append(do[len(di):])
+    return outputs
+
 
 def inference_w_ntg(args, chat, model, tokenizer, device):
     tokenized_chat = tokenizer.apply_chat_template(chat, tokenize=False, add_generation_prompt=False, return_tensors="pt")
@@ -185,6 +203,56 @@ def generate_data(idx_num, model, tokenizer, question, answer, args, device):
     
 # generate data end
 
+def generate_data_batch(idx_num, model, tokenizer, question, answer, args, device):
+    insts=[]
+    chat=[
+        {"role": "user", "content": question}
+    ]
+    # with open("current.txt", "w") as f:
+    #    text = f"{idx_num}. {question}\n\nlabel:{answer}"
+    #    f.write(text+'\n')
+    
+    initial_response = inference(chat, model, tokenizer, device, sampling=False)
+    print("initial_response: ", initial_response)
+    # with open("current.txt", "a+") as f:
+    #    text = f"initial_response: {initial_response}"
+    #    f.write(text+'\n')
+
+    chat.append({"role": "assistant", "content": initial_response})
+    chat.append({"role": "user", "content": feedback_prompt})
+
+    # number of feedbacks * chat
+    feedback_chat = [chat for _ in range(args.feedbacks)]
+    revisions=[]
+    correct = []
+    feedbacks = inference_batch(feedback_chat, model, tokenizer, device)
+    for feedback in feedbacks:
+        partial_chat = [
+            {"role": "assistant", "content": feedback},
+            {"role": "user", "content": refine_prompt}
+        ]
+        refine_chat = [chat+partial_chat for _ in range(args.num_revision)]
+        revisions = inference_batch(refine_chat, model, tokenizer, device, sampling=True, temperature=1.0)
+        for rc, r in zip(refine_chat, revisions):
+            rc.append({"role": "assistant", "content": r})
+            rc.append({"role": "user", "content": args.direct_answer_trigger})
+        final_predictions = inference_batch(refine_chat, model, tokenizer, device, sampling=False)
+        for pred in final_predictions:
+            if check(args, pred, answer):
+                cnt+=1
+                correct.append(True)
+            else:
+                correct.append(False)
+        insts.append({
+            'idx': idx_num,
+            'question': question,
+            'initial_response': initial_response,
+            'feedback': feedback,
+            'revised_response': revisions,
+            'correct': correct,
+            'score': cnt / args.num_revision
+        })
+    return insts
 
 
 

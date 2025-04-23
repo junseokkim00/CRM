@@ -8,3 +8,6 @@ langchain
 langchain_openai
 langchain_core
 pydantic
+protobuf
+sentencepiece
+trl

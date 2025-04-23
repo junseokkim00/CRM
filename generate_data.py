@@ -5,7 +5,7 @@ import time
 import os
 from dotenv import load_dotenv
 import json
-from utils import fix_seed, print_now, feedback_prompt, refine_prompt, generate_data, datasetLoader
+from utils import fix_seed, print_now, feedback_prompt, refine_prompt, generate_data, datasetLoader, generate_data_batch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
@@ -58,7 +58,9 @@ def main():
             question = x
             answer = y.strip()
 
-            insts = generate_data(i, model, tokenizer, question, answer, args, device)
+            # insts = generate_data(i, model, tokenizer, question, answer, args, device)
+            insts = generate_data_batch(i, model, tokenizer, question, answer, args, device)
+            
 
             with open(f"./logs/{args.dataset}_{model_name}_crm_k:{args.num_feedbacks}_n:{args.num_revision}_start:{args.start}_end:{args.end}.jsonl", "a+") as f:
                 for inst in insts:

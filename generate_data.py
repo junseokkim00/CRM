@@ -46,6 +46,9 @@ def main():
 
     if not os.path.exists('./logs'):
         os.mkdir('./logs')
+
+    if args.end == 0:
+        args.end = len(dataloader)
             
     for i, data in enumerate(dataloader):
         if args.start <= i and i < args.end:

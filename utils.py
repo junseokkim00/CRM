@@ -222,11 +222,12 @@ def generate_data_batch(idx_num, model, tokenizer, question, answer, args, devic
     chat.append({"role": "user", "content": feedback_prompt})
 
     # number of feedbacks * chat
-    feedback_chat = [chat for _ in range(args.feedbacks)]
-    revisions=[]
-    correct = []
+    feedback_chat = [chat for _ in range(args.num_feedbacks)]
     feedbacks = inference_batch(feedback_chat, model, tokenizer, device)
     for feedback in feedbacks:
+        cnt=0
+        revisions=[]
+        correct = []
         partial_chat = [
             {"role": "assistant", "content": feedback},
             {"role": "user", "content": refine_prompt}

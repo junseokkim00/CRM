@@ -13,7 +13,11 @@ $ pip install -r requirements.txt
 2. enter `HF_TOKEN` at `.env`
 + refer to [this link](https://huggingface.co/docs/hub/security-tokens)
 
-3. execute `run.sh`
+3. execute `generate_data.sh`
++ 자신 이름에 맞게 uncomment 후 실행하기
 ```bash
 $ sbatch run.sh
 ```
+
+
+4. 

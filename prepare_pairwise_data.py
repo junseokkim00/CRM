@@ -39,14 +39,14 @@ if __name__ ==  "__main__":
     args = parser.parse_args()
 
 
-    initial_verdict = {}
+    initial_verdicts = {}
     # 1. save initial_response_verdict at dictionary
     with open(args.initial_response_path, "r") as f:
         verdicts = f.readlines()
     
     for verdict in verdicts:
         inst = json.loads(verdict)
-        initial_verdict[inst['idx']] = inst['correct']
+        initial_verdicts[inst['idx']] = inst['correct']
 
 
     # 2. read initial_response path
@@ -69,7 +69,7 @@ if __name__ ==  "__main__":
     wrong_pairwise_data=[]
     for key in crms:
         question, initial_response = crms[key][0]['question'], crms[key][0]['initial_response']
-        initial_verdict = initial_verdict[key]
+        initial_verdict = initial_verdicts[key]
 
         inst1, inst2, inst3 = crms[key][0], crms[key][1], crms[key][2]
 

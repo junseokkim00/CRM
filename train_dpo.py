@@ -1,5 +1,6 @@
 import os
 import json
+import argparse
 from typing import Dict
 from dataclasses import dataclass
 from datasets import load_dataset, Dataset
@@ -46,10 +47,18 @@ def preprocess_dpo_dataset(jsonl_path: str, tokenizer) -> Dataset:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pairwise_data_path", type=str)
+    parser.add_argument("--model_name", type=str)
+    parser.add_argument("--output_dir", type=str)
+    args = parser.parse_args()
     # config
-    json_path = "./logs/pairwise_gsm8k_initial_correct.jsonl"  # <- 수정 필요
-    model_name = "meta-llama/Llama-3.2-3B-Instruct"
-    output_dir = "./dpo_llama8b_output_w_correct_data"
+    # json_path = "./logs/commonsenseqa_pairwise_correct.jsonl"  # <- 수정 필요
+    # model_name = "meta-llama/Llama-3.2-3B-Instruct"
+    # output_dir = "./dpo_llama3b_output_w_correct_data_commonsenseqa"
+    json_path = args.pairwise_data_path
+    model_name = args.model_name
+    output_dir = args.output_dir
 
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     model = AutoModelForCausalLM.from_pretrained(
@@ -70,7 +79,7 @@ def main():
         num_train_epochs=3,
         logging_steps=10,
         save_steps=100,
-        save_total_limit=2,
+        save_total_limit=1,
         bf16=True,
         report_to="none",
     )

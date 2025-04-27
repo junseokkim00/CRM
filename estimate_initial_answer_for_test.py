@@ -130,7 +130,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--limit_dataset_size", type=int, default=10, help="whether to limit test dataset size. if 0, the dataset size is unlimited and we use all the samples in the dataset for testing."
+        "--limit_dataset_size", type=int, default=0, help="whether to limit test dataset size. if 0, the dataset size is unlimited and we use all the samples in the dataset for testing."
     )
 
     parser.add_argument(

@@ -129,7 +129,7 @@ def check(args, pred, label):
         pred = answer_cleansing(args, pred)    
         pred = clean_pred(pred)
         label = clean_ans(label)
-        # print(f"pred: {pred}, label: {label}")
+        print(f"pred: {pred}, label: {label}")
         if pred == label:
             return True
     except:

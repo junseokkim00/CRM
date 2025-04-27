@@ -22,4 +22,7 @@ $ sbatch run.sh
 
 4. `estimate_initial_answer.sh`에 자신의 dataset을 넣고, 위의 뽑은 data path 입력 후, 실험 돌리기
 5. `prepare_pairwise_data.sh`에서 `initial_response_path`, `crm_data_path`, `dataset` 채우고 돌려서 pairwise_data 만들기
-6. To be continue...
+6. `train_dpo_w_args.sh`에서 dataset에 맞게 사용하기
+7. `evaluate.sh`을 통해서 학습 시킨 DPO model로 self-refine하기
+8. `estimate_initial_answer.sh`로 돌아와서 initial response 정답 유무 확인하기
+9. 

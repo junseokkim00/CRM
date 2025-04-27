@@ -41,6 +41,9 @@ def main():
 
     checklist = set()
 
+    if args.end == 0:
+        args.end = len(lines) // 3
+
     for i, line in enumerate(lines):
         idx = i // 3
         if args.start <= idx and idx < args.end:
@@ -136,7 +139,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--limit_dataset_size", type=int, default=10, help="whether to limit test dataset size. if 0, the dataset size is unlimited and we use all the samples in the dataset for testing."
+        "--limit_dataset_size", type=int, default=0, help="whether to limit test dataset size. if 0, the dataset size is unlimited and we use all the samples in the dataset for testing."
     )
 
     parser.add_argument(

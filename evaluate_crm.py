@@ -42,7 +42,10 @@ def datasetLoader(dataset_name, split='train'):
     if split == 'train':
         dataset = dataset['train']
     else:
-       dataset = dataset['test']
+        if dataset_name == 'commonsenseqa':
+            dataset = dataset['validation']
+        else:
+            dataset = dataset['test']
     for data in tqdm(dataset):
         if dataset_name == 'gsm8k':
             dataloader.append((data['question'], data['answer'].split("####")[-1].strip()))
